@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dynamic-batching-llm-scheduler"
+version = "0.1.0"
+description = "A measured sequential and dynamic-batching LLM inference gateway"
+readme = "README.md"
+license = "MIT"
+keywords = ["llm", "inference", "dynamic-batching", "fastapi", "pytorch"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "fastapi==0.116.1",
+  "httpx==0.28.1",
+  "numpy==2.2.6",
+  "pydantic-settings==2.10.1",
+  "torch==2.7.1",
+  "transformers==4.53.2",
+  "uvicorn[standard]==0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "matplotlib==3.10.3",
+  "pandas==2.3.1",
+  "pytest==8.4.1",
+  "pytest-asyncio==1.1.0",
+  "ruff==0.12.4",
+  "tabulate==0.9.0",
+]
+
+[project.scripts]
+llm-scheduler = "llm_scheduler.cli:main"
+llm-loadgen = "llm_scheduler.loadgen:main"
+llm-benchmark = "llm_scheduler.benchmark:main"
+llm-plots = "llm_scheduler.plots:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/llm_scheduler"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"data/prompts.jsonl" = "llm_scheduler/data/prompts.jsonl"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = ["e2e: starts a real HTTP server"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]

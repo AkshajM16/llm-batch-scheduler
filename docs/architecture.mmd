@@ -1,0 +1,14 @@
+flowchart LR
+    C[Concurrent HTTP clients] --> A[FastAPI /v1/generate]
+    A --> Q{Bounded admission queue}
+    Q -->|full| O[HTTP 429]
+    Q -->|accepted| B[Prompt-length bucket]
+    B --> D{Dispatch trigger}
+    D -->|bucket reaches max_batch_size| G[Batch generation]
+    D -->|oldest reaches max_wait_ms| G
+    G --> T[Pad + tokenize together]
+    T --> M[One model.generate call]
+    M --> R[Correlate output futures by request ID]
+    R --> A
+    A --> C
+    G --> X[Latency, tokens, padding, errors]

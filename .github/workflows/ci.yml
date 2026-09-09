@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          enable-cache: true
+          python-version-file: .python-version
+
+      - name: Install locked dependencies
+        run: uv sync --locked --extra dev
+
+      - name: Run formatting, lint, unit, and live-server tests
+        run: make verify
